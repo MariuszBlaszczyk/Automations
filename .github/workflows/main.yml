@@ -25,6 +25,22 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            if [ ! -d "~/ansible/.git" ]; then
+              echo "Klonowanie repozytorium..."
+              git clone git@github.com:MariuszBlaszczyk/Automations.git ~/ansible
+            else
+              echo "Aktualizacja repozytorium..."
+              cd ~/ansible
+              git pull origin main
+            fi
+
       - name: Create Ansible Inventory
         run: |
           cat > ansible/inventory.ini <<EOF
@@ -34,3 +50,4 @@ jobs:
       - name: Run Ansible playbook on VPS
         run: |
           ansible-playbook -i ansible/inventory.ini ansible/install.yml
+
