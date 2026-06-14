@@ -15,3 +15,13 @@
         - nodejs
         - npm
       state: present
+
+      cd ~
+          if [ ! -d "ansible/.git" ]; then
+              git clone git@github.com:MariuszBlaszczyk/Automations.git
+          else
+              echo "Repozytorium istnieje, wykonuje git pull"
+              cd ansible
+              git pull origin main
+              cd ..
+          fi
